@@ -49,3 +49,25 @@ function drawArrow(config: Config, from: Coordinates, to: Coordinates) {
     ctx.lineTo(to[0] - headLen * Math.cos(angle + Math.PI / 6), to[1] - headLen * Math.sin(angle + Math.PI / 6));
     ctx.stroke();
 }
+
+export function getSurroundingTiles(board: (Tile | null)[][], coordinates: Coordinates) {
+    const surroundingTiles: [(string | undefined), number][] = [];
+
+    const RADIUS = 7; // uneven number
+    const DISTANCE = (RADIUS - 1) / 2
+    let DELTAS = [];
+    for (let i = -DISTANCE; i <= DISTANCE; i++) DELTAS.push(i);
+
+    // LTR
+    DELTAS.forEach(deltaY => {
+        DELTAS.forEach(deltaX => {
+            const Y = coordinates[0] + deltaX;
+            const X = coordinates[1] + deltaY;
+            const tile = board?.[Y]?.[X];
+            const distance = Math.max(Math.abs(deltaY), Math.abs(deltaX));
+            surroundingTiles.push([tile?.text, distance]);
+        })
+    })
+
+    return surroundingTiles;
+}

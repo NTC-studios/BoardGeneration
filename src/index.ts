@@ -1,6 +1,6 @@
 import { tiles } from "./tiles.js";
 import { Config, Coordinates, Tile } from "./types.js";
-import { drawTile, makeBoard, randomInt } from "./utils.js";
+import { drawTile, getSurroundingTiles, makeBoard, randomInt } from "./utils.js";
 
 // DEBUG HELP
 
@@ -15,7 +15,7 @@ import { drawTile, makeBoard, randomInt } from "./utils.js";
 //     notile: 35,
 // }
 
-const rates = {
+const rates: { [key: string]: number } = {
     empty: 20,
     gold: 10,
     shop: 8,
@@ -47,7 +47,7 @@ const config: Config = {
     ctx: ctx
 }
 // Width - Height
-const boardSize = [12, 6];
+const boardSize = [9, 6];
 if (boardSize[0] * boardSize[1] > 256) throw new Error("Board too big");
 
 const board: (Tile | null)[][] = makeBoard(boardSize[1], boardSize[0]);
@@ -69,17 +69,31 @@ for (const tile of haveMinSpawn) {
 
 // Step 2, filter the tiles and get constants
 let tilesToSpawn = tiles.filter(tile => tile.rate > 0 && tile.maxSpawn !== 0);
-let totalRate = tilesToSpawn.reduce((a, b) => a + b.rate, 0);
-let tileIndexer: number[] = tilesToSpawn.map(v => v.rate).map((sum => value => sum += value)(0));
 
 for (let i = 0; i < boardSize[0]; i++) {
     for (let j = 0; j < boardSize[1]; j++) {
         if (board[i][j]) continue;
 
+        let sessionTiles = structuredClone(tilesToSpawn);
+
+        getSurroundingTiles(board, [i, j])
+            .filter(v => v[1] > 0)
+            .forEach(tileType => {
+                const t = sessionTiles.find(tile => tile.text === tileType[0]);
+                if (t && t.text !== "empty") {
+                    const divisor = Math.max(-0.5 * tileType[1] + 2.5, 0)
+                    t.rate = Math.floor(t.rate / divisor);
+                };
+            });
+
+        let totalRate = sessionTiles.reduce((a, b) => a + b.rate, 0);
+        let tileIndexer: number[] = sessionTiles.map(v => v.rate).map((sum => value => sum += value)(0));
+
+        // Change rates based on tiles around
         const tileToSpawn = randomInt(1, totalRate);
         const indexer = tileIndexer.findIndex(v => tileToSpawn <= v);
         if (indexer === -1) console.log(tileToSpawn)
-        const tile = tilesToSpawn[indexer];
+        const tile = sessionTiles[indexer];
 
         drawTile(config, [i, j], tile);
         board[i][j] = structuredClone(tile);
@@ -87,8 +101,6 @@ for (let i = 0; i < boardSize[0]; i++) {
             tile.maxSpawn -= 1;
             if (tile.maxSpawn !== 0) continue;
             tilesToSpawn = tilesToSpawn.filter(tile => tile.maxSpawn !== 0);
-            totalRate = tilesToSpawn.reduce((a, b) => a + b.rate, 0);
-            tileIndexer = tilesToSpawn.map(v => v.rate).map((sum => value => sum += value)(0));
         }
     }
 }
