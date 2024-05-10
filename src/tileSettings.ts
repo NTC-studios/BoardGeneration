@@ -1,4 +1,4 @@
-export const tiles = [
+export const tileSettings = [
     { // Start
         "rate": 0,
         "minSpawn": 1,

@@ -1,6 +1,4 @@
-export type Coordinates = [number, number];
-
-export type Tile = {
+export type TileSettings = {
     rate: number,
     minSpawn: number | null,
     maxSpawn: number | null,
