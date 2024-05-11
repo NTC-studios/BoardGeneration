@@ -8,7 +8,9 @@ export default class Tile {
         public fillColour: string,
         public textColour = "#FFFFFF",
         public coordinates: [number, number],
-        public connections: Tile[] = []
+        public connections: Tile[] = [],
+        public maxConnections: number | null,
+        public minConnections = 1,
     ) {
         this.ID = crypto.randomUUID();
     }

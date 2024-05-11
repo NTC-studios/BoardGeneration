@@ -1,6 +1,6 @@
 import Tile from "./Tile.js";
 import { Config, TileSettings } from "./types";
-import { randomInt } from "./utils.js";
+import { clamp, randomInt } from "./utils.js";
 
 export default class Board {
     board: (Tile | null)[][] = [];
@@ -44,7 +44,10 @@ export default class Board {
                 tile.text,
                 tile.fillColour,
                 tile.textColour ?? "#FFFFFF",
-                coords as [number, number]
+                coords as [number, number],
+                [],
+                tile.maxConnections,
+                tile.minConnections ?? 1
             );
 
             if (tile.maxSpawn) tile.maxSpawn -= 1;
@@ -79,7 +82,10 @@ export default class Board {
                     tile.text,
                     tile.fillColour,
                     tile?.textColour ?? "#FFFFFF",
-                    [i, j] as [number, number]
+                    [i, j] as [number, number],
+                    [],
+                    tile.maxConnections,
+                    tile.minConnections ?? 1
                 )
 
                 if (tile.maxSpawn) {
@@ -95,31 +101,45 @@ export default class Board {
             for (let j = 0; j < this.boardSize[1]; j++) {
                 const self = this.board[i][j];
                 if (!self || self.text === "notile") continue;
+                if (self.connections.length === self.maxConnections) continue;
 
                 const availableConnections = this.getAvailableConnections([i, j]);
-                const flattened = Object.entries(availableConnections).map(v => v[1]).flat();
-
-                const maxAllowedConnections = this.tileSettings.find(v => v.text === self.text)?.maxConnections ?? Infinity;
-                const max = Math.min(flattened.length - 1, maxAllowedConnections)
-                const randomCon = flattened[randomInt(0, max)];
-
                 const availableDirections = Object.keys(availableConnections).length;
-                const amountOfConnections = randomInt(1, availableDirections);
+                const selfTile = this.tileSettings.find(v => v.text === self.text)!;
+
+                const STEEPNESS = 7;
+                const formula = Math.round(availableDirections * (Math.random() ** STEEPNESS) + 1);
+                const realMax = Math.min(self.maxConnections ?? Infinity, availableDirections);
+                const amountOfConnections = clamp(formula, selfTile.minConnections ?? 1, realMax);
 
                 for (let i = 0; i < amountOfConnections; i++) {
-                    // TODO get more than 1 connection
-                }
+                    const directions = Object.keys(availableConnections);
+                    const randomDirection = directions[randomInt(0, directions.length - 1)];
 
-                self.connections.push(randomCon);
+                    const possibleTiles = availableConnections[randomDirection];
+                    const randomTile = possibleTiles[randomInt(0, possibleTiles.length - 1)];
+
+                    delete availableConnections[randomDirection];
+
+                    if (randomTile.maxConnections === randomTile.connections.length) continue;
+
+                    self.connections.push(randomTile);
+                    randomTile.connections.push(self);
+                }
             }
         }
 
-        this.draw();
-
         // TODO get rid of the islands
-        const start = this.findTile("start");
-        const flamingo = this.findTile("flamingo");
-        console.log(this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[flamingo[0]][flamingo[1]]!));
+        // const start = this.findTile("start");
+        // const flamingo = this.findTile("flamingo");
+        // const distance = this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[flamingo[0]][flamingo[1]]!);
+        // console.log(distance);
+        // if (distance === -1) {
+        //     this.clear();
+        //     this.populate();
+        // }
+
+        this.draw();
     }
 
     private draw() {

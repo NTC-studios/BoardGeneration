@@ -7,15 +7,6 @@ const ctx = canvas.getContext("2d")!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// background image for style points
-const background = new Image();
-background.src = "../assets/background.png";
-for (let i = 0; i < ctx.canvas.width; i++) {
-    for (let j = 0; j < ctx.canvas.height; j++) {
-        ctx.drawImage(background, i * background.width, j * background.width);
-    }
-}
-
 const config: Config = {
     TILE_SIZE: 100,
     SPACING: 25,
