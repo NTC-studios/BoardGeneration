@@ -134,7 +134,8 @@ export default class Board {
         const flamingo = this.findTile("flamingo");
         const distance = this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[flamingo[0]][flamingo[1]]!);
 
-        if (distance === -1 || distance < 3) {
+        const maxDistance = 1.5 * (this.boardSize[0] + this.boardSize[1]) / 2
+        if (distance === -1 || distance < 3 || distance > maxDistance) {
             this.clear();
             this.populate();
         }
