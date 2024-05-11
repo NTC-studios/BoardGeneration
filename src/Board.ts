@@ -229,6 +229,7 @@ export default class Board {
     }
 
     private distanceBetweenTiles(tile1: Tile, tile2: Tile) {
+        const CANT_PASS = ["shadow", "teleport"];
         let level = 0;
         const queue: Tile[] = [];
         queue.push(...tile1.connections);
@@ -246,6 +247,7 @@ export default class Board {
                 }
 
                 for (const con of t.connections) {
+                    if (CANT_PASS.includes(con.text)) continue;
                     const coords = con.coordinates.join(".");
                     if (!visited.has(coords)) queue.push(con);
                 }
