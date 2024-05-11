@@ -38,26 +38,3 @@ document.addEventListener("keypress", event => {
         board.populate();
     }
 })
-
-
-// // Step 3, draw all the connections
-// for (let i = 0; i < boardSize[0]; i++) {
-//     for (let j = 0; j < boardSize[1]; j++) {
-//         const self = board[i][j];
-//         if (self?.text === "notile") continue;
-
-
-//         [-1, 0, 1].forEach(deltaY => {
-//             [-1, 0, 1].forEach(deltaX => {
-//                 const tile = board?.[i + deltaY]?.[j + deltaX]
-//                 const random = randomInt(0, 100);
-
-//                 if (tile && tile.text !== "notile" && random > 70) {
-//                     const isOneWay = randomInt(0, 100) > 60;
-//                     drawConnection(config, [i, j], [i + deltaY, j + deltaX], isOneWay);
-//                 }
-//             })
-//         })
-
-//     }
-// }
