@@ -130,14 +130,14 @@ export default class Board {
         }
 
         // TODO get rid of the islands
-        // const start = this.findTile("start");
-        // const flamingo = this.findTile("flamingo");
-        // const distance = this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[flamingo[0]][flamingo[1]]!);
-        // console.log(distance);
-        // if (distance === -1) {
-        //     this.clear();
-        //     this.populate();
-        // }
+        const start = this.findTile("start");
+        const flamingo = this.findTile("flamingo");
+        const distance = this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[flamingo[0]][flamingo[1]]!);
+
+        if (distance === -1 || distance < 3) {
+            this.clear();
+            this.populate();
+        }
 
         this.draw();
     }
@@ -228,29 +228,33 @@ export default class Board {
         return [Y, X];
     }
 
-    // TODO rewrite this at a normal time of day
     private distanceBetweenTiles(tile1: Tile, tile2: Tile) {
-        const queue = tile1.connections;
+        let level = 0;
+        const queue: Tile[] = [];
+        queue.push(...tile1.connections);
         const visited = new Set();
-        const distances: number[] = [];
-        distances.push(0)
 
         while (queue.length) {
-            const t = queue.shift()!;
-            visited.add(t.coordinates.join("."))
-            const depth = distances.shift()!;
+            let level_size = queue.length;
 
-            if (t.coordinates[0] === tile2.coordinates[0] && t.coordinates[1] === tile2.coordinates[1]) {
-                return depth + 1;
-            }
+            while (level_size) {
+                const t = queue.shift()!;
+                visited.add(t.coordinates.join("."));
 
-            for (const con of t.connections) {
-                const coords = con.coordinates.join(".")
-                if (!visited.has(coords)) queue.push(con);
-                distances.push(depth + 1);
+                if (t.coordinates[0] === tile2.coordinates[0] && t.coordinates[1] === tile2.coordinates[1]) {
+                    return level;
+                }
+
+                for (const con of t.connections) {
+                    const coords = con.coordinates.join(".");
+                    if (!visited.has(coords)) queue.push(con);
+                }
+
+                level_size -= 1;
             }
+            level++;
         }
 
-        return -1
+        return -1;
     }
 }
