@@ -7,10 +7,22 @@ const ctx = canvas.getContext("2d")!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let BOARD_SIZE = [6, 9] as [number, number]; // Height, Width
+const newSize = prompt("Board size? (W H):", "6 9")?.split(" ").map(Number);
+if (newSize?.length === 2) {
+    BOARD_SIZE[0] = newSize[0];
+    BOARD_SIZE[1] = newSize[1]
+}
+
+const tileWidth = Math.floor(canvas.width / (BOARD_SIZE[1] + BOARD_SIZE[1] * 0.25));
+const tileHeight = Math.floor(canvas.height / (BOARD_SIZE[0] + BOARD_SIZE[0] * 0.25));
+const tileSize = Math.min(tileWidth, tileHeight);
+const fontSize = Math.round(tileSize * 0.25);
+
 const config: Config = {
-    TILE_SIZE: 100,
-    SPACING: 25,
-    TEXT_SIZE: 25,
+    TILE_SIZE: tileSize,
+    SPACING: fontSize,
+    TEXT_SIZE: fontSize,
     ctx: ctx
 }
 
@@ -27,7 +39,7 @@ const rates: { [key: string]: number } = {
 
 const board = new Board(
     config,
-    [6, 9], // Height, Width
+    BOARD_SIZE,
     tileSettings,
     rates
 )
