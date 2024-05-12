@@ -110,7 +110,8 @@ export default class Board {
                 const STEEPNESS = 7;
                 const formula = Math.round(availableDirections * (Math.random() ** STEEPNESS) + 1);
                 const realMax = Math.min(self.maxConnections ?? Infinity, availableDirections);
-                const amountOfConnections = clamp(formula, selfTile.minConnections ?? 1, realMax);
+                const realMin = Math.min(selfTile.minConnections ?? 1, availableDirections)
+                const amountOfConnections = clamp(formula, realMin, realMax);
 
                 for (let i = 0; i < amountOfConnections; i++) {
                     const directions = Object.keys(availableConnections);
@@ -259,5 +260,33 @@ export default class Board {
         }
 
         return -1;
+    }
+
+    export() {
+        const tileData: string[] = [];
+
+        for (let i = 0; i < this.boardSize[0]; i++) {
+            for (let j = 0; j < this.boardSize[1]; j++) {
+                const tile = this.board[i][j]!;
+                if (tile.text === "notile") continue;
+
+                let coordinates = "";
+                const coordinateLengths = tile.coordinates.map(v => `${v}`.length);
+                if (coordinateLengths.includes(3)) {
+                    coordinates = tile.coordinates.join(".");
+                } else {
+                    coordinates = tile.coordinates
+                        .map(v => `${v}`.length === 1 ? `0${v}` : v)
+                        .join(".");
+                }
+
+                const tileType = btoa(this.tileSettings.findIndex(v => v.text === tile.text).toString());
+
+
+
+            }
+        }
+
+        console.log(tileData)
     }
 }

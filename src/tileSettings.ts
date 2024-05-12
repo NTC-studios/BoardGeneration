@@ -3,7 +3,7 @@ export const tileSettings = [
         "rate": 0,
         "minSpawn": 1,
         "maxSpawn": 1,
-        "minConnections": null,
+        "minConnections": 3,
         "maxConnections": null,
         "text": "start",
         "fillColour": "#28b49b",
