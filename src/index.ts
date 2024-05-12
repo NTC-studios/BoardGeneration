@@ -8,7 +8,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let BOARD_SIZE = [6, 9] as [number, number]; // Height, Width
-const newSize = prompt("Board size? (W H):", "6 9")?.split(" ").map(Number);
+const newSize = prompt("Board size? (H W):", "6 9")?.split(" ").map(Number);
 if (newSize?.length === 2) {
     BOARD_SIZE[0] = newSize[0];
     BOARD_SIZE[1] = newSize[1]
@@ -43,6 +43,8 @@ const board = new Board(
     tileSettings,
     rates
 )
+
+board.export();
 
 document.addEventListener("keypress", event => {
     if (event.code === 'Space') {
