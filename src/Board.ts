@@ -235,14 +235,14 @@ export default class Board {
         let level = 0;
         const queue: Tile[] = [];
         queue.push(...tile1.connections);
-        const visited = new Set();
+        const visited: Set<string> = new Set();
 
         while (queue.length) {
             let level_size = queue.length;
 
             while (level_size) {
                 const t = queue.shift()!;
-                visited.add(t.coordinates.join("."));
+                visited.add(t.ID);
 
                 if (t.coordinates[0] === tile2.coordinates[0] && t.coordinates[1] === tile2.coordinates[1]) {
                     return level;
@@ -250,8 +250,7 @@ export default class Board {
 
                 for (const con of t.connections) {
                     if (CANT_PASS.includes(con.text)) continue;
-                    const coords = con.coordinates.join(".");
-                    if (!visited.has(coords)) queue.push(con);
+                    if (!visited.has(con.ID)) queue.push(con);
                 }
 
                 level_size -= 1;
