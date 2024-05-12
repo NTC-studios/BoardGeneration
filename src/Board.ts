@@ -133,10 +133,18 @@ export default class Board {
         // TODO get rid of the islands
         const start = this.findTile("start");
         const flamingo = this.findTile("flamingo");
-        const distance = this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[flamingo[0]][flamingo[1]]!);
+        const shadow = this.findTile("shadow");
+        const distance = this.distanceBetweenTiles(
+            this.board[start[0]][start[1]]!,
+            this.board[flamingo[0]][flamingo[1]]!,
+            ["shadow", "teleport"]
+        );
+        const shadowDistance = this.distanceBetweenTiles(this.board[start[0]][start[1]]!, this.board[shadow[0]][shadow[1]]!)
 
-        const maxDistance = 1.5 * (this.boardSize[0] + this.boardSize[1]) / 2
-        if (distance === -1 || distance < 3 || distance > maxDistance) {
+        const maxDistance = 1.5 * (this.boardSize[0] + this.boardSize[1]) / 2;
+        const minDistance = 0.5 * (this.boardSize[0] + this.boardSize[1]) / 2;
+
+        if (distance === -1 || distance < minDistance || distance > maxDistance || shadowDistance === 1) {
             this.clear();
             this.populate();
         }
@@ -230,9 +238,8 @@ export default class Board {
         return [Y, X];
     }
 
-    private distanceBetweenTiles(tile1: Tile, tile2: Tile) {
-        const CANT_PASS = ["shadow", "teleport"];
-        let level = 0;
+    private distanceBetweenTiles(tile1: Tile, tile2: Tile, CANT_PASS: string[] = []) {
+        let level = 1;
         const queue: Tile[] = [];
         queue.push(...tile1.connections);
         const visited: Set<string> = new Set();
